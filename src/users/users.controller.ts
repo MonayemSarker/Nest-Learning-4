@@ -3,7 +3,7 @@ import { CreateUserDto } from './dtos/create-user.dto';
 import { UsersService } from './users.service';
 import { UpdateUserDto } from './dtos/update-user.dto';
 import { UseInterceptors, ClassSerializerInterceptor } from '@nestjs/common';
-import { SerializeInterceptor } from 'src/interceptors/serialize.interceptor';
+import { serialize } from 'src/interceptors/serialize.interceptor';
 import { UserDto } from './dtos/user.dto';
 @Controller('auth')
 export class UsersController {
@@ -16,14 +16,18 @@ export class UsersController {
         
     }
 
-    @UseInterceptors(new SerializeInterceptor(UserDto))
+    // @UseInterceptors(new SerializeInterceptor(UserDto))
+    // instead of using the above line of code, we will use our custom decorator
+    @serialize(UserDto)
     @Get(':id')
     findUser(@Param('id') id: string){
         console.log("Handler is running");
         return this.userService.findOne(parseInt(id));
     }
 
-    @UseInterceptors(new SerializeInterceptor(UserDto))
+    // @UseInterceptors(new SerializeInterceptor(UserDto))
+    // instead of using the above line of code, we will use our custom decorator
+    @serialize(UserDto)
     @Get('')
     findAll(@Query('email') email: string){
         return this.userService.find(email);

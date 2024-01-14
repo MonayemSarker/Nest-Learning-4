@@ -4,6 +4,11 @@ import { map } from "rxjs/operators";
 import { plainToClass } from "class-transformer";
 import { UserDto } from "src/users/dtos/user.dto";
 
+//custom decorator for using the custom interceptor
+export function serialize(dto: any){
+    return UseInterceptors(new SerializeInterceptor(dto));
+}
+
 export class SerializeInterceptor implements NestInterceptor{
 
     constructor(private dto: any){
