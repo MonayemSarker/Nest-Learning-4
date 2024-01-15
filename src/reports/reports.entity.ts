@@ -7,13 +7,16 @@ export class Report {
     id: number;
 
     @Column()
+    model: string;
+
+    @Column()
     price: number;
+
+    @Column({default: false})
+    approved: boolean;
 
     @Column()
     make: string;
-
-    @Column()
-    model: string;
 
     @Column()
     year: number;
