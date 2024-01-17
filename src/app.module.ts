@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { MiddlewareConsumer, Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { UsersModule } from './users/users.module';
@@ -7,6 +7,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { User } from './users/users.entity';
 import { Report } from './reports/reports.entity';
 import { ConfigService, ConfigModule } from '@nestjs/config';
+const cookieSession = require('cookie-session');
 
 
 @Module({
@@ -15,7 +16,7 @@ import { ConfigService, ConfigModule } from '@nestjs/config';
       isGlobal: true,
       envFilePath: `.env`,
     }),
-  //   TypeOrmModule.forRoot({
+    // TypeOrmModule.forRoot()
   //   type: 'sqlite',
   //   database: 'db.sqlite',
   //   entities: [User, Report],
@@ -29,7 +30,11 @@ import { ConfigService, ConfigModule } from '@nestjs/config';
         type: 'sqlite',
         database: config.get<string>('DB_NAME'),
         entities: [User, Report],
-        synchronize: true
+        synchronize: true,
+        migrations: ['migrations/*.js'],
+        cli: {
+          migrationDir: 'migrations',
+        }
       }
     }
   }),
@@ -38,5 +43,14 @@ import { ConfigService, ConfigModule } from '@nestjs/config';
   controllers: [AppController],
   providers: [AppService],
 })
-export class AppModule {}
+export class AppModule {
+  constructor(private configService: ConfigService){}
+    configure(consume: MiddlewareConsumer){
+      consume.apply(
+        cookieSession(
+         { keys: [this.configService.get('COOKIE_KEY')]}
+        )
+      ).forRoutes('*');
+    }  
+}
  
